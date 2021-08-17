@@ -1,0 +1,38 @@
+//@version=4
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// ©abhi8614
+
+study(title="CPR Histogram by Abhi", shorttitle="CPR Histogram by Abhi")
+
+pivottimeframe = input(title="Pivot Resolution", defval="D", options=["D", "W", "M"])
+
+//dp in the prefix implies daily pivot calculation
+dpopen = security(syminfo.tickerid, pivottimeframe, open[1], barmerge.gaps_off, barmerge.lookahead_on)
+dphigh = security(syminfo.tickerid, pivottimeframe, high[1], barmerge.gaps_off, barmerge.lookahead_on)
+dplow = security(syminfo.tickerid, pivottimeframe, low[1], barmerge.gaps_off, barmerge.lookahead_on)
+dpclose = security(syminfo.tickerid, pivottimeframe, close[1], barmerge.gaps_off, barmerge.lookahead_on)
+
+//CPR Calculation
+pivot = (dphigh + dplow + dpclose) / 3.0
+bc = (dphigh + dplow) / 2.0
+tc = pivot - bc + pivot
+width = (abs(tc - bc) / pivot) * 100
+
+hColor = if width < 0.25
+    color.red
+else if (width > 0.25 and width < 0.5)
+    color.orange
+else if (width > .50 and width < 0.75)
+    color.yellow
+else if (width > 0.75 and width < 1)
+    color.green
+else if width > 1
+    color.black
+
+plot(width, title="CPR Width", style = plot.style_columns, color = hColor , transp=0) 
+band0 = hline(0.25, color=color.black, linestyle=hline.style_solid)
+band1 = hline(0.50, color=color.black, linestyle=hline.style_solid)
+band2 = hline(0.75, color=color.black, linestyle=hline.style_solid)
+band3 = hline(1, color=color.green, linestyle=hline.style_solid)
+band4 = hline(1.25, color=color.green, linestyle=hline.style_solid)
+band5 = hline(1.50, color=color.green, linestyle=hline.style_solid)
